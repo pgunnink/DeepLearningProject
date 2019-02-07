@@ -43,7 +43,7 @@ from models import CycleGenerator, DCDiscriminator
 
 SEED = 11
 
-l = .01
+opts.cycle_loss_scale = .01
 
 
 # Set the random seed manually for reproducibility.
@@ -281,7 +281,7 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
             reconstructed_Y = G_XtoY(fake_X)
             # 3. Compute the cycle consistency loss (the reconstruction loss)
             cycle_consistency_loss = 1/(len(images_Y)) * torch.sum((images_Y - reconstructed_Y)**2)
-            g_loss += l * cycle_consistency_loss
+            g_loss += opts.cycle_loss_scale * cycle_consistency_loss
 
         g_loss.backward()
         g_optimizer.step()
@@ -304,7 +304,7 @@ def training_loop(dataloader_X, dataloader_Y, test_dataloader_X, test_dataloader
             reconstructed_X = G_YtoX(fake_Y)
             # 3. Compute the cycle consistency loss (the reconstruction loss)
             cycle_consistency_loss = 1/(len(images_X)) * torch.sum((images_X - reconstructed_X)**2)
-            g_loss += l * cycle_consistency_loss
+            g_loss += opts.cycle_loss_scale * cycle_consistency_loss
 
         g_loss.backward()
         g_optimizer.step()
@@ -390,6 +390,7 @@ def create_parser():
 
     # new options
     parser.add_argument('--weight_norm', action='store_true', default=False)
+    parse.add_argument('--cycle_loss_scale', type=float, default=1)
 
     return parser
 
